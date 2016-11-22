@@ -30,9 +30,6 @@ public abstract class Car {
     public Car(int x, int y) {
         this.xt = x;
         this.yt = y;
-        // car is initialized at rest
-        this.x_speed = 0;
-        this.y_speed = 0;
     }
     /*
         Get/Set Methods
@@ -129,18 +126,22 @@ public abstract class Car {
         Behaviors Section
      */
     public boolean carRace() {
+        this.raceBehavior.race();
         return true;
     }
 
     public boolean carCrash() {
+        this.crashBehavior.crash();
         return true;
     }
 
     public boolean setCrashBehavior(CrashBehavior cb) {
+        this.crashBehavior = cb;
         return true;
     }
 
     public boolean setRaceBehavior(RaceBehavior rb) {
+        this.raceBehavior = rb;
         return true;
     }
 }

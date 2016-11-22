@@ -6,4 +6,7 @@ package ReinforcementLearning;
  */
 public class SARSA implements RaceBehavior {
     
+    public void race() {
+        
+    }
 }

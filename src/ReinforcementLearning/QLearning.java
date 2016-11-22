@@ -6,4 +6,7 @@ package ReinforcementLearning;
  */
 public class QLearning implements RaceBehavior {
     
+    public void race() {
+        
+    }
 }
