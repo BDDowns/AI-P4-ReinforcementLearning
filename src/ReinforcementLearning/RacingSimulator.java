@@ -6,4 +6,7 @@ package ReinforcementLearning;
  */
 public class RacingSimulator {
     
+    public static void main (String[] args) {
+        
+    }
 }
