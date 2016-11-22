@@ -16,7 +16,8 @@ public class Car {
     private int y_speed;
     
     // cars have behaviors for crashing and for racing, declare them here
-    
+    private RaceBehavior raceBehavior;
+    private CrashBehavior crashBehavior;
     
     /**
      * The car constructor takes in the initial position of the car as arguments
@@ -86,9 +87,9 @@ public class Car {
     }
     
     /* 
-     * My interpretation of the problem statement is that acceleration can add
-     * an element of {1,0,-1} to the current speed. The boolean is just incase
-     * that comes in handy.
+        My interpretation of the problem statement is that acceleration can add
+        an element of {1,0,-1} to the current speed. The boolean is just incase
+        that comes in handy.
      */
     
     /**
@@ -123,5 +124,25 @@ public class Car {
         } else {
             return false;
         }
+    }
+    
+    /*
+        Behaviors Section
+    */
+    
+    public boolean carRace() {
+        return true;
+    }
+    
+    public boolean carCrash() {
+        return true;
+    }
+    
+    public boolean setCrashBehavior(CrashBehavior cb) {
+        return true;
+    }
+    
+    public boolean setRaceBehavior(RaceBehavior rb) {
+        return true;
     }
 }
