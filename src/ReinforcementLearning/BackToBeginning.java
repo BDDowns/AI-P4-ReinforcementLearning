@@ -6,7 +6,7 @@ package ReinforcementLearning;
  */
 public class BackToBeginning implements CrashBehavior {
     
-    public void crash() {
+    public void crash(Car c) {
         
     }
 }

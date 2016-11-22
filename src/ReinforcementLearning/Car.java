@@ -10,6 +10,9 @@ public abstract class Car {
     protected int MAX_SPEED;
 
     // instance variables for the car
+    
+    // record starting position to be used for restart crash
+    protected int x0, y0;
     // car normally wouldn't know where it is, but this one has GPS
     // int position for x, y at time t
     protected int xt, yt;
@@ -30,6 +33,8 @@ public abstract class Car {
     public Car(int x, int y) {
         this.xt = x;
         this.yt = y;
+        this.x0 = x;
+        this.y0 = y;
     }
     /*
         Get/Set Methods
@@ -125,21 +130,49 @@ public abstract class Car {
     /*
         Behaviors Section
      */
-    public boolean carRace() {
-        this.raceBehavior.race();
+    
+    /**
+     * carRace method starts a race with the current instance of the car and a 
+     * track object to be passed as an argument
+     * 
+     * @param t a track object containing a track
+     * @return true if the race completed
+     */
+    public boolean carRace(Track t) {
+        this.raceBehavior.race(this, t);
         return true;
     }
 
+    /**
+     * carCrash crashes the instance of car called
+     * @return true if car crash succeeded (sounds weird, eh?)
+     */
     public boolean carCrash() {
-        this.crashBehavior.crash();
+        this.crashBehavior.crash(this);
         return true;
     }
 
+    /**
+     * setCrashBehavior allows for easy switching of the crash method by 
+     * assigning a crash behavior for a given car instance or model by extending
+     * car and creating new car subclasses. This allows for further
+     * extension with different crash types and dynamic races.
+     * 
+     * @param cb CrashBehavior to be assigned to specified instance of Car
+     * @return true for crash behavior applied
+     */
     public boolean setCrashBehavior(CrashBehavior cb) {
         this.crashBehavior = cb;
         return true;
     }
 
+    /**
+     * setRaceBehavior allows for easy switching of race behavior for a specific
+     * instance of a Car subclass. Makes testing the rest of the algorithm easier.
+     * 
+     * @param rb RaceBehavior to be assigned to the specified instance of a subclass of car
+     * @return true for success
+     */
     public boolean setRaceBehavior(RaceBehavior rb) {
         this.raceBehavior = rb;
         return true;
