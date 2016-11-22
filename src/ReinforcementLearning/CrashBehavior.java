@@ -4,6 +4,6 @@ package ReinforcementLearning;
  *
  * @author Group 22
  */
-public class ValueIteration implements RaceBehavior {
+public interface CrashBehavior {
     
 }

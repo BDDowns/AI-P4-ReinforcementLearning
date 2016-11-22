@@ -15,6 +15,9 @@ public class Car {
     private int x_speed;
     private int y_speed;
     
+    // cars have behaviors for crashing and for racing, declare them here
+    
+    
     /**
      * The car constructor takes in the initial position of the car as arguments
      * and returns a car object with said position variables.
