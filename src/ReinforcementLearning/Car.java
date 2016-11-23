@@ -22,6 +22,9 @@ public abstract class Car {
     // cars have behaviors for crashing and for racing, declare them here
     protected RaceBehavior raceBehavior;
     protected CrashBehavior crashBehavior;
+    
+    // track reference for crash search
+    protected Track track;
 
     /**
      * The car constructor takes in the initial position of the car as arguments
@@ -139,6 +142,7 @@ public abstract class Car {
      * @return true if the race completed
      */
     public boolean carRace(Track t) {
+        this.track = t;
         this.raceBehavior.race(this, t);
         return true;
     }
