@@ -1,6 +1,7 @@
 package ReinforcementLearning;
 
-import java.io.FileReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  *  
@@ -8,7 +9,7 @@ import java.io.FileReader;
  */
 public class RacingSimulator {
     
-    public static void main (String[] args) {
+    public static void main (String[] args) throws FileNotFoundException, IOException {
         
         // nothing fancy yet, just make some tracks and try one at a time
         Track l_track = new Track("L-track.txt");
