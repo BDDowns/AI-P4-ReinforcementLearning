@@ -22,8 +22,11 @@ public class RacingSimulator {
                 2. Create a track from a file
                 3. Run <car>.carRace(<track>)
         */
+        // need to decide on starting location and how to handle
         Car racecar = new Racecar(0,0);
         racecar.carRace(l_track);
+        racecar.carRace(o_track);
+        racecar.carRace(r_track);
         
         /*
             To switch Race type
@@ -32,12 +35,20 @@ public class RacingSimulator {
         */
         racecar.setRaceBehavior(new QLearning());
         racecar.carRace(l_track);
+        racecar.carRace(o_track);
+        racecar.carRace(r_track);
         /*
             To change Crash type
                 1. Set <car>.setCrashBehavior(<CrashBehavior>)
                 2. Run <car>.carRace(<track>)
         */
         racecar.setCrashBehavior(new BackToBeginning());
-        racecar.carRace(l_track);
+        racecar.carRace(r_track);
+        
+        /*
+            One more time through to test BacktoBeginning
+        */
+        racecar.setRaceBehavior(new ValueIteration());
+        racecar.carRace(r_track);
     }
 }

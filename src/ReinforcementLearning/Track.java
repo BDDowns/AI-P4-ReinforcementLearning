@@ -11,9 +11,13 @@ import java.util.Scanner;
  * @author Group 22
  */
 public class Track {
+    // holds the character array representing the track
     private char[][] track;
+    // holds the row and column sizes y and x respectively
     private int y, x;
     private String temp;
+    // starting coordinates for the track
+    private int start_x, start_y;
     
     /**
      * Track takes a file name for a file located in the project directory
@@ -24,7 +28,6 @@ public class Track {
      */
     public Track (String file) {
         trackbuilder(file);
-        
     }
     
     
