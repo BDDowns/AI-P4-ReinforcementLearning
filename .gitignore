@@ -1,0 +1,15 @@
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.temp/
+
+#PackageFiles #
+*.war
+*.ear
+*.xml
+
+
+#virtual machine crash logs
+hs_err_pid*
+/build/
+/dist/
