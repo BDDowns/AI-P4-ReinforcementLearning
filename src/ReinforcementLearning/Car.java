@@ -27,8 +27,8 @@ public abstract class Car {
     protected Track track;
 
     /**
-     * The car constructor takes in the initial position of the car as arguments
-     * and returns a car object with said position variables.
+     * The car constructor takes in the initializes a car object with 
+     * an initial position set to given parameters
      *
      * @param x x-coordinate of the car at time t = 0
      * @param y y-coordinate of the car at time t = 0
