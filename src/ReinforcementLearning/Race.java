@@ -62,7 +62,23 @@ public class Race {
     }
     
     private boolean crashCheck() {
-        return false;
+        // check if off the track
+        if (car.yt > track.length || car.yt < 0 || car.xt > track[0].length || 
+                car.xt < 0) {
+            return true;
+        // check if crossed the finish line
+        } else {
+            if (car.y_speed > car.x_speed) {
+                // go y first and check positions of the vector
+                return false;
+            } else if (car.y_speed < car.x_speed) {
+                // go x firxt and check positions of the vector
+                return false;
+            } else {
+                // go y and x equally and check positions of the vector
+                return false;
+            }
+        }
     }
     
     private void setStart() {
