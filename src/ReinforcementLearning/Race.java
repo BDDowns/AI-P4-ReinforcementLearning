@@ -55,13 +55,13 @@ public class Race {
             car.updatePosition();
             
             // check for crash condition
-            if (crashCheck()) {
+            if (vectorCheck()) {
                 car.carCrash();
             }
         }
     }
     
-    private boolean crashCheck() {
+    private boolean vectorCheck() {
         // check if off the track
         if (car.yt > track.length || car.yt < 0 || car.xt > track[0].length || 
                 car.xt < 0) {
@@ -126,6 +126,15 @@ public class Race {
     
     
     private void printTrack() {
-        
+        for (int i = 0; i < track.length; i++) {
+            for (int j = 0; j < track[0].length; j++) {
+                if (car.yt == i && car.xt == j) {
+                    System.out.print('c');
+                } else {
+                    System.out.print(track[i][j]);
+                }
+            }
+            System.out.println();
+        }
     }
 }
