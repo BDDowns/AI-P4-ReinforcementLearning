@@ -47,6 +47,7 @@ public class Race {
         while (!finished) {
             // decrease score per time step
             score -= 0.1;
+            printTrack();
             // extract policy at xt, yt
             car.accelY(policy[car.yt][car.xt][0]);
             car.accelX(policy[car.yt][car.xt][1]);
@@ -70,12 +71,15 @@ public class Race {
         } else {
             if (car.y_speed > car.x_speed) {
                 // go y first and check positions of the vector
+
                 return false;
             } else if (car.y_speed < car.x_speed) {
-                // go x firxt and check positions of the vector
+                // go x first and check positions of the vector
+                
                 return false;
             } else {
                 // go y and x equally and check positions of the vector
+                
                 return false;
             }
         }
