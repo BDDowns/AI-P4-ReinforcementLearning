@@ -15,6 +15,7 @@ public class RacingSimulator {
         Track l_track = new Track("L-track.txt");
         Track o_track = new Track("O-track.txt");
         Track r_track = new Track("R-track.txt");
+        Track test = new Track("test.txt");
 
         /*
             To start a new race:
@@ -23,8 +24,8 @@ public class RacingSimulator {
                 3. Run <car>.carRace(<track>)
          */
         // need to decide on starting location and how to handle
-        Car racecar = new Racecar(3, 34);
-        racecar.carRace(l_track);
+        Car racecar = new Racecar(3, 12);
+        racecar.carRace(test);
         // racecar.carRace(o_track);
        // racecar.carRace(r_track);
 
@@ -34,7 +35,7 @@ public class RacingSimulator {
                 2. Run <car>.carRace(<track>)
          */
         racecar.setRaceBehavior(new SARSA());
-        racecar.carRace(l_track);
+        racecar.carRace(test);
         // racecar.carRace(o_track);
         // racecar.carRace(r_track);
         /*
