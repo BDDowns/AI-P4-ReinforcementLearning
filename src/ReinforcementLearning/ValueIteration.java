@@ -13,6 +13,8 @@ public class ValueIteration implements RaceBehavior {
     static char[][] track;
     double[][] value;
     double[][] value_1;
+    double[][] reward;
+    Integer[][][] bestAction;
     Track t;
     Car c;
     boolean close;
@@ -23,9 +25,11 @@ public class ValueIteration implements RaceBehavior {
         this.t = t;
         track = t.getTrack();
         value = new double[track.length][track[0].length];
+        reward = new double[track.length][track[0].length];
+        bestAction = new Integer[track.length][track[0].length][2];
         this.c = c;
         place_Values();
-        //setNearFinish();
+        setNearFinish();
         setActions();
         do_Calc(value);
     }
@@ -36,15 +40,19 @@ public class ValueIteration implements RaceBehavior {
             for (int j = 0; j < track[0].length; j++) {
                 if (track[i][j] == 'F') {
                     value[i][j] = 1;
+                    reward[i][j] = 0;
                 }
                 if (track[i][j] == '#') {
                     value[i][j] = -1;
+                    reward[i][j] = -1;
                 }
                 if (track[i][j] == '.') {
                     value[i][j] = 0;
+                    reward[i][j] = -0.1;
                 }
                 if (track[i][j] == 'S') {
                     value[i][j] = 0;
+                    reward[i][j] = -0.1;
                 }
                 System.out.print(value[i][j] + " ");
             }
@@ -132,16 +140,16 @@ public class ValueIteration implements RaceBehavior {
         double[][] value_1 = new double[value.length][value[0].length];
         cloneArray(value, value_1);
         double epsilon = 0.001;
-        double discount = 0.75;
+        double discount = 0.5;
 
         do {
-            cloneArray(value_1, value);
+//            cloneArray(value_1, value);
             delta = 0;
             for (int i = 0; i < value.length; i++) {
                 for (int j = 0; j < value[0].length; j++) {
                     if (track[i][j] == '.') {
-                        // compute utility based on utility of neighbors
-                        value_1[i][j] = value[i][j] + getMaxActionUtility(i, j);
+                        // compute utility based on utility of neighbors     
+                        value[i][j] = reward[i][j] + getMaxActionUtility(i, j);
                         if (Math.abs(value_1[i][j] - value[i][j]) > delta) {
                             delta = Math.abs(value_1[i][j] - value[i][j]);
                         }
@@ -153,35 +161,91 @@ public class ValueIteration implements RaceBehavior {
 
     }
 
-    // return max Sigma(s1) P(s1 | s, a) * U[s1]
+    /**
+     * getMaxActionUtility takes the cars current position and evaluates the 
+     * reward with the most utility given position and velocity. The best action
+     * for i, j is also updated in the actions array.
+     * 
+     * @param i y value for the cars position
+     * @param j x value for the cars position
+     * @return double value of the most utility 
+     */
     public double getMaxActionUtility(int i, int j) {
         Integer[] move;
-        double max = -1;
+        // because java can't follow my logic of bestMove being initialized before
+        // the else below...
+        Integer[] bestMove = actions.get(0);
+        boolean hasMove = false;
+        double max = 0;
         for (int k = 0; k < actions.size(); k++) {
-            // make sure not out of bounds
+            // since velocity is taken into account we will gate access to areas
+            // off the track
             move = actions.get(k);
-            max = Math.max(max, 0.8 * value[i + move[0]][j + move[1]]
-                    + 0.2 * value[i][j]);
+            // evaluate payoff of action if an inbounds option exists
+            if (c.y_speed + move[0] + i < track.length &&
+                    c.y_speed + move[0] + i > 0 &&
+                    c.x_speed + move[1] + j < track[0].length &&
+                    c.x_speed + move[1] + j > 0) {
+                // if in here the move doesn't go completely off the track
+                // if first time in here set the best move to move that got us here
+                if (!hasMove) {
+                    bestMove = move;
+                    max = calculateUtility(move, i, j);
+                } else {
+                    // we've already assigned a max and best move
+                    // evaluate current bestMove against other move that got here
+                    if (calculateUtility(move, i, j) > calculateUtility(bestMove, i, j)) {
+                        bestMove = move;
+                        bestAction[i][j] = bestMove;
+                        max = calculateUtility(move, i, j);
+                    }
+                }
+                // flag that there is a move available that doesn't crash car
+                hasMove = true;           
+            } 
         }
-        return max;
+        if (hasMove) {
+            return max;
+        } else {
+            c.carCrash();
+            return -1; // utility of a wall
+        }
     }
 
     public void printValues() {
-        for (int i = 0; i < value.length; i++) {
-            for (int j = 0; j < value[0].length; j++) {
-                if (track[i][j] == '.' || track[i][j] == 'F') {
-                    System.out.format("%3d ", (int)value[i][j]);
-                }
+        // print out the track in a better way
+        for (int i = 0; i < track.length; i++) {
+            for (int j = 0; j < track[0].length; j++) {
+                System.out.print(value[i][j] + " ");
             }
             System.out.println();
         }
     }
-    
+
     public void cloneArray(double[][] original, double[][] target) {
         for (int i = 0; i < original.length; i++) {
             for (int j = 0; j < original[0].length; j++) {
                 target[i][j] = original[i][j];
             }
         }
+    }
+
+    public double getUtility(int i, int j) {
+        if (track[i][j] == 'F') {
+            return track[i][j];
+        }
+        value[i][j] = getMaxActionUtility(i, j);
+        getUtility(i, j);                           // return next step
+        return 0;
+    }
+    
+    public double calculateUtility(Integer[] move, int i, int j) {
+        double probWorks = 0.8;
+        double probFails = 1 - probWorks;
+        
+        double utility = probWorks * value[i + c.y_speed + move[0]][j + c.x_speed + move[1]] +
+                            probFails * value[i + c.y_speed][j + c.x_speed];
+        
+        return utility;
     }
 }
