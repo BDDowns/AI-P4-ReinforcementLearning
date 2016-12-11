@@ -229,22 +229,13 @@ public class ValueIteration implements RaceBehavior {
             }
         }
     }
-
-    public double getUtility(int i, int j) {
-        if (track[i][j] == 'F') {
-            return track[i][j];
-        }
-        value[i][j] = getMaxActionUtility(i, j);
-        getUtility(i, j);                           // return next step
-        return 0;
-    }
     
     public double calculateUtility(Integer[] move, int i, int j) {
         double probWorks = 0.8;
         double probFails = 1 - probWorks;
         
-        double utility = probWorks * value[i + c.y_speed + move[0]][j + c.x_speed + move[1]] +
-                            probFails * value[i + c.y_speed][j + c.x_speed];
+        double utility = (probWorks * value[i + c.y_speed + move[0]][j + c.x_speed + move[1]]) +
+                            ((1- probWorks) * value[i + c.y_speed][j + c.x_speed]);
         
         return utility;
     }
