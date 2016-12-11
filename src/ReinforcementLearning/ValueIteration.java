@@ -48,11 +48,10 @@ public class ValueIteration implements RaceBehavior {
                 }
                 if (track[i][j] == '.') {
                     value[i][j] = 0;
-                    reward[i][j] = 0;
+                    reward[i][j] = -0.1;
                 }
                 if (track[i][j] == 'S') {
                     value[i][j] = 0;
-                    reward[i][j] = 0.1;
                 }
 //                System.out.print(value[i][j] + " ");
             }
@@ -138,7 +137,7 @@ public class ValueIteration implements RaceBehavior {
         double delta;
         cloneArray(this.value, value_1);
         double epsilon = 0.001;
-        double discount = 0.5;
+        double discount = 1;
 
         do {
             cloneArray(value_1, this.value);
@@ -159,6 +158,7 @@ public class ValueIteration implements RaceBehavior {
         
         // print final array
         printValues();
+        printMoves();
     }
 
     /**
@@ -217,6 +217,18 @@ public class ValueIteration implements RaceBehavior {
         for (int i = 0; i < this.value.length; i++) {
             for (int j = 0; j < this.value[0].length; j++) {
                 System.out.format("%+3.2f ", this.value[i][j]);
+            }
+            System.out.println();
+        }
+    }
+    
+    public void printMoves() {
+        for (int i = 0; i < track.length; i++) {
+            for (int j = 0; j < track[0].length; j++) {
+                if (track[i][j] == '.') {
+                    System.out.format("Coordinate: (%d, %d) - Move: Y(%d), X(%d) "
+                            ,i, j, bestAction[i][j][0], bestAction[i][j][1]);
+                }
             }
             System.out.println();
         }
