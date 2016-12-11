@@ -65,10 +65,11 @@ public class State {
         
         switch (c) {
             case '#' : {
-                return -5;
+                this.qValue = -10;
+                return -10;
             }
             case 'F' : {
-                return 100;
+                return 0;
             }
             case '.' : {
                 return 0;

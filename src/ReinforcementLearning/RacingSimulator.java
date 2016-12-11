@@ -24,8 +24,8 @@ public class RacingSimulator {
                 3. Run <car>.carRace(<track>)
          */
         // need to decide on starting location and how to handle
-        Car racecar = new Racecar(3, 12);
-        racecar.carRace(test);
+        Car racecar = new Racecar(3, 35);
+        racecar.carRace(l_track);
         // racecar.carRace(o_track);
        // racecar.carRace(r_track);
 
@@ -35,7 +35,7 @@ public class RacingSimulator {
                 2. Run <car>.carRace(<track>)
          */
         racecar.setRaceBehavior(new SARSA());
-        racecar.carRace(test);
+        racecar.carRace(l_track);
         // racecar.carRace(o_track);
         // racecar.carRace(r_track);
         /*
