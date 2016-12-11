@@ -23,7 +23,7 @@ public class RacingSimulator {
                 3. Run <car>.carRace(<track>)
          */
         // need to decide on starting location and how to handle
-        Car racecar = new Racecar(6, 1);
+        Car racecar = new Racecar(3, 34);
         racecar.carRace(l_track);
         // racecar.carRace(o_track);
        // racecar.carRace(r_track);

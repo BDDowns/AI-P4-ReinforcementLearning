@@ -14,16 +14,30 @@ import java.util.ArrayList;
 public class State {
 
     int xLoc, yLoc;
-    Integer reward;
+    double reward;
     Integer[] action = new Integer[2];
     ArrayList<Integer[]> finalStates = new ArrayList<>();
+    Track track;
+    Integer[] finalPos;
+    double qValue = 0;
 
     // Need to set rewards based of distance to finish line I think...
     // Not sure though. If this is done should be straigh forward to fiinish
-    public State(int x, int y, char c, Track t) {
+    public State(int x, int y, char c, Track t, Integer[] fp) {
         this.xLoc = x;
         this.yLoc = y;
+        track = t;
+        finalPos = fp;
         this.reward = setReward(c);
+        
+    }
+    
+    public void setQvalue(double q){
+        this.qValue = q;
+    }
+    
+    public double getQvalue(){
+        return this.qValue;
     }
 
     public Integer[] getLocation() {
@@ -34,28 +48,34 @@ public class State {
         return location;
     }
     
-    public Integer getReward() {
+    public double getReward() {
         return this.reward;
     }
     
-    private int setReward(char c) {
+    private double setReward(char c) {
         
         switch (c) {
             case '#' : {
-                return 0;
+                return -1;
             }
             case 'F' : {
-                return 5;
+                return 100;
             }
             case '.' : {
-                return 2;
+                return 0;
             }
             case 'S' : {
-                return 1;
+                return 0;
             }
         }
         
         return 1;
+    }
+    
+    public double distanceFromGoal(){
+        double distance = Math.sqrt(Math.pow((this.finalPos[0]-this.xLoc),2) + Math.pow((this.finalPos[1]-this.yLoc),2));
+        System.out.println(distance);
+        return distance;
     }
     
     public void setAction(Integer[] a){

@@ -1,6 +1,7 @@
 package ReinforcementLearning;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -8,8 +9,13 @@ import java.util.ArrayList;
  */
 public class SARSA implements RaceBehavior {
 
+    // states is our training matrix, populated with q values via SARSA
     State[][] states;
     ArrayList<Integer[]> actions = new ArrayList<>();
+    final double alpha = 0.01;
+    final double lamda = 0.01;
+    final double gamma = 0.1;
+    final double epsilon = 0.1;
 
     @Override
     public void race(Car c, Track t) {
@@ -24,8 +30,7 @@ public class SARSA implements RaceBehavior {
 
     // set possible actions 
     public void setActions() {
-        // 0 index is x, 1 index is y
-
+        // 0 index is x, 1 index is y. the printed graph is inverted I think
         Integer[] n = new Integer[2];
         n[0] = 1;
         n[1] = 0;
@@ -34,40 +39,42 @@ public class SARSA implements RaceBehavior {
         e[0] = 0;
         e[1] = 1;
         this.actions.add(e);
-        Integer[] ne = new Integer[2];
-        ne[0] = 1;
-        ne[1] = 1;
-        this.actions.add(ne);
-        Integer[] se = new Integer[2];
-        se[0] = -1;
-        se[1] = 1;
-        this.actions.add(se);
         Integer[] s = new Integer[2];
         s[0] = -1;
         s[1] = 0;
         this.actions.add(s);
-        Integer[] sw = new Integer[2];
-        sw[0] = -1;
-        sw[1] = -1;
-        this.actions.add(sw);
         Integer[] w = new Integer[2];
-        s[0] = -1;
-        s[1] = 0;
-        this.actions.add(s);
-        Integer[] nw = new Integer[2];
-        nw[0] = -1;
-        nw[1] = 1;
-        this.actions.add(nw);
+        w[0] = 0;
+        w[1] = -1;
+        this.actions.add(w);
+    }
 
+    // get the final position to help with Q-value
+    public Integer[] getFinalPosition(Track t) {
+        Integer[] finalPos = new Integer[2];
+        boolean found = false;
+
+        for (int i = 0; i < t.getTrack().length; i++) {
+            for (int j = 0; j < t.getTrack()[0].length; j++) {
+                if (t.getTrack()[i][j] == 'F' && !found) {
+                    found = true;
+                    finalPos[0] = i;
+                    finalPos[1] = j;
+                }
+            }
+        }
+        return finalPos;
     }
 
     public void setInitialStates(Track t) {
+
+        Integer[] finalPos = getFinalPosition(t);
         // loop through every state, setting a reward for each possible state
         // the rewards acts as a Q-Value Q(s,a)
         this.states = new State[t.getTrack().length][t.getTrack()[0].length];
         for (int i = 0; i < t.getTrack().length; i++) {
             for (int j = 0; j < t.getTrack()[0].length; j++) {
-                this.states[i][j] = new State(i, j, t.getTrack()[i][j], t);
+                this.states[i][j] = new State(i, j, t.getTrack()[i][j], t, finalPos);
             }
         }
     }
@@ -92,11 +99,24 @@ public class SARSA implements RaceBehavior {
 //        t.getTrack()[car.xt][car.yt] = 'C';
 //        printTrack(t);
         implementSarsa(car, t);
+        printStates();
 
     }
 
+    public Integer[] getRandomAction() {
+        Random r = new Random();
+        int l = 0;
+        int h = 3;
+        int rand = r.nextInt(h - l) + l;
+
+        return actions.get(rand);
+    }
+
     public void implementSarsa(Car car, Track t) {
+        ArrayList<State> path = new ArrayList<>();
+        ArrayList<Double> qValues = new ArrayList<>();
         State newState;
+        State state;
         double reward;
         double currentQ, nextQ, finalQ;
         boolean done = false;
@@ -105,64 +125,88 @@ public class SARSA implements RaceBehavior {
         currentState[0] = car.xt;
         currentState[1] = car.yt;
 
-        Integer[] action = getAction(car);
+        states[car.xt][car.yt].setQvalue(0.5);
+        qValues.add(0.5);
+        state = states[car.xt][car.yt];
+        Integer[] action = getRandomAction();
 
+        path.add(states[car.xt][car.yt]);
         // While we have yet to reach 'F' use SARSA to continue to search
         while (!done) {
             newState = nextState(currentState, action);
+            path.add(newState);
+            t.getTrack()[state.xLoc][state.yLoc] = '.';
+            t.getTrack()[newState.xLoc][newState.yLoc] = 'C';
+            printTrack(t);
             reward = newState.getReward();
-            
-            Integer[] action2 = newAction(newState);
-            
-            // currentQ = getQ(currentState, action)
-            // nextQ = getQ(nextState, action2)
-            // finalQ = currentQ + alpha * (reward + gamma * nextQ - currentQ)
-            // update stateReward
-            
-            //state = newState
-            //action = newaction
-            
-            //if final state done == true
-            
-            break;
+
+            if (reward == -1) {
+                //crash();
+                System.out.println("crash");
+                break;
+            } else {
+                Integer[] action2 = newAction(newState, state);
+                System.out.println(action2[0]);
+                System.out.println(action2[1]);
+                currentQ = state.getQvalue();
+                nextQ = newState.getQvalue();
+                finalQ = currentQ + alpha * (reward + gamma * nextQ - currentQ);
+                qValues.add(finalQ);
+                newState.setQvalue(finalQ);
+                newState.reward = finalQ;
+                // update stateReward
+                state = newState;
+                currentState[0] = state.xLoc;
+                currentState[1] = state.yLoc;
+                action = action2;
+                //if final state done == true
+                if (state.getReward() == 100) {
+                    System.out.println("finish");
+                    break;
+                }
+
+            }
         }
     }
-    
-    public Integer[] newAction(State s){
-        Integer[] a = new Integer[2];
-        // need to handle acceleration
+
+    public Integer[] newAction(State s, State previous) {
+        double rand = Math.random();
+        if(rand < .25){
+            return getRandomAction();
+        }
         
-        for(int i = 0; i < actions.size(); i++){
+        Integer[] a = new Integer[2];
+        a[0] = s.xLoc;
+        a[1] = s.yLoc;
+        double max = -999;
+        // need to handle acceleration // e-greedy too
+
+        for (int i = 0; i < actions.size(); i++) {
             //find new action
-        }
-        
-        return a;
-    }
+            Integer newX = s.xLoc + actions.get(i)[0];
+            Integer newY = s.yLoc + actions.get(i)[1];
 
-    public Integer[] getAction(Car car) {
-        Integer[] a = new Integer[2];
-        double max = 0;
-
-        for (int i = 0; i < this.actions.size(); i++) {
-            Integer newX = car.xt + actions.get(i)[0];
-            Integer newY = car.yt + actions.get(i)[1];
-            int move = this.states[newX][newY].getReward();
-            if (move > max) {
+            double move = this.states[newX][newY].getReward();
+            // make sure we aren't moving backwards
+            if (move < max) {
                 max = move;
                 a[0] = actions.get(i)[0];
                 a[1] = actions.get(i)[1];
             }
-
         }
 
         return a;
     }
 
+
     public State nextState(Integer[] currentState, Integer[] action) {
         Integer newX = currentState[0] + action[0];
         Integer newY = currentState[1] + action[1];
-
-        return this.states[newX][newY];
+        if(newX < this.states.length && newY < this.states[0].length) {
+        return this.states[newX][newY];}
+        else{
+            return this.states[currentState[0]][currentState[1]];
+        }
     }
 
     public void printTrack(Track t) {
