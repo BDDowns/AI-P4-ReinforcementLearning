@@ -65,7 +65,7 @@ public class State {
         
         switch (c) {
             case '#' : {
-                return -10;
+                return -5;
             }
             case 'F' : {
                 return 100;

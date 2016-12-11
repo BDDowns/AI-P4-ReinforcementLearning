@@ -51,28 +51,29 @@ public class SARSA implements RaceBehavior {
             State current = this.states[c.xt][c.yt];
             this.states[c.xt][c.yt].setVisited();
             Integer[] action = getRaceAction(c, current, t);
-            System.out.println(action[0]);
-            System.out.println(action[1]);
 
             Integer newX = action[0] + c.xt;
             Integer newY = action[1] + c.yt;
-            t.getTrack()[c.xt][c.yt] = '.';
+            if (t.getTrack()[newX][newY] != '#') {
+                t.getTrack()[c.xt][c.yt] = '.';
 
-            c.xt = newX;
-            c.yt = newY;
+                c.xt = newX;
+                c.yt = newY;
 
-            t.getTrack()[c.xt][c.yt] = 'C';
+                t.getTrack()[c.xt][c.yt] = 'C';
+            } else {
+                System.out.println("CRASH");
+            }
             printTrack(t);
         }
 
     }
 
     public Integer[] getRaceAction(Car c, State current, Track t) {
-//        double rand = Math.random();
-//        if (rand < epsilon) {
-//            return getRandomAction();
-//        }
-// change to 20% error later
+        double rand = Math.random();
+        if (rand < .2) {
+            return getRandomAction();
+        }
 
         Integer[] a = new Integer[2];
         a[0] = 0;
@@ -234,7 +235,7 @@ public class SARSA implements RaceBehavior {
 
             newState.setQvalue(finalQ);
 
-            if (reward == -10) {
+            if (reward == -5) {
                 t.getTrack()[state.xLoc][state.yLoc] = '.';
                 t.getTrack()[newState.xLoc][newState.yLoc] = '#';
                 state.setQvalue(finalQ);
