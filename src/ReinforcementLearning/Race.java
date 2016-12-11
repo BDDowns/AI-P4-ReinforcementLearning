@@ -1,6 +1,7 @@
 package ReinforcementLearning;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -18,16 +19,23 @@ public class Race {
         this.car = car;
         this.t = t;
         this.track = t.getTrack();
-        setStart();
     }
     
     public void start() {
+        setStart();
         setCar();
         race();
     }
     
     private void setCar() {
+        // Randomize position on starting line
         
+        Random r =  new Random();
+        int index = r.nextInt(startingLine.size());
+        
+        // set car at selected start
+        car.y0 = startingLine.get(index)[0];
+        car.x0 = startingLine.get(index)[1];
     }
     
     private void race() {
