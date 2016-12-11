@@ -20,6 +20,7 @@ public class State {
     Track track;
     Integer[] finalPos;
     double qValue = 0;
+    boolean visited = false;
 
     // Need to set rewards based of distance to finish line I think...
     // Not sure though. If this is done should be straigh forward to fiinish
@@ -30,6 +31,14 @@ public class State {
         finalPos = fp;
         this.reward = setReward(c);
         
+    }
+    
+    public void setVisited(){
+        this.visited = true;
+    }
+    
+    public boolean getVisited(){
+        return this.visited; 
     }
     
     public void setQvalue(double q){

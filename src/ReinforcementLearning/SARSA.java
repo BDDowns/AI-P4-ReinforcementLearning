@@ -14,10 +14,11 @@ public class SARSA implements RaceBehavior {
     State[][] previousStates;
 
     ArrayList<Integer[]> actions = new ArrayList<>();
+    // tunable parameters
     final double alpha = 0.01;
     final double lamda = 0.01;
     final double gamma = 0.1;
-    final double epsilon = 0.15;
+    final double epsilon = 0.12;
 
     @Override
     public void race(Car c, Track t) {
@@ -28,7 +29,77 @@ public class SARSA implements RaceBehavior {
         setPreviousStates(t);
         setActions();
         move(c, t);
-        //printStates();
+        printStates();
+
+        //beginTimeTrials
+        System.out.println("");
+        startRace(c, t);
+    }
+
+    public void startRace(Car c, Track t) {
+        //Starting position
+        c.x0 = 5;
+        c.y0 = 1;
+        c.xt = 5;
+        c.yt = 1;
+        double reward = 0;
+        t.getTrack()[c.x0][c.y0] = 'C';
+        printTrack(t);
+
+        while (reward != 100) {
+            reward = this.states[c.xt][c.yt].getReward();
+            State current = this.states[c.xt][c.yt];
+            this.states[c.xt][c.yt].setVisited();
+            Integer[] action = getRaceAction(c, current, t);
+            System.out.println(action[0]);
+            System.out.println(action[1]);
+
+            Integer newX = action[0] + c.xt;
+            Integer newY = action[1] + c.yt;
+            t.getTrack()[c.xt][c.yt] = '.';
+
+            c.xt = newX;
+            c.yt = newY;
+
+            t.getTrack()[c.xt][c.yt] = 'C';
+            printTrack(t);
+        }
+
+    }
+
+    public Integer[] getRaceAction(Car c, State current, Track t) {
+//        double rand = Math.random();
+//        if (rand < epsilon) {
+//            return getRandomAction();
+//        }
+// change to 20% error later
+
+        Integer[] a = new Integer[2];
+        a[0] = 0;
+        a[1] = 0;
+
+        double max = -999;
+        double move;
+        // need to handle acceleration // e-greedy too
+
+        for (int i = 0; i < actions.size(); i++) {
+            //find new action
+            Integer newX = c.xt + actions.get(i)[0];
+            Integer newY = c.yt + actions.get(i)[1];
+            move = this.states[newX][newY].getQvalue();
+            // make sure we aren't moving backwards
+            if (!this.states[newX][newY].getVisited()) {
+                if (move > max) {
+                    if (t.getTrack()[newX][newY] != '#') {
+                        max = move;
+                        a[0] = actions.get(i)[0];
+                        a[1] = actions.get(i)[1];
+                    }
+                }
+            }
+        }
+
+        return a;
     }
 
     public void setPreviousStates(Track t) {
@@ -112,10 +183,10 @@ public class SARSA implements RaceBehavior {
         // place car arbitrarily on S and print track
         // then begin SARSA
         t.getTrack()[car.x0][car.y0] = 'C';
-        printTrack(t);
+        //printTrack(t);
 
         implementSarsa(car, t);
-        printStates();
+        // printStates();
 
     }
 
@@ -129,9 +200,6 @@ public class SARSA implements RaceBehavior {
     }
 
     public void implementSarsa(Car car, Track t) {
-        ArrayList<State> path = new ArrayList<>();
-
-        ArrayList<Double> qValues = new ArrayList<>();
         State newState;
         State state;
         double reward;
@@ -147,18 +215,15 @@ public class SARSA implements RaceBehavior {
         //qValues.add(0.5);
         state = states[car.xt][car.yt];
         State startingState = state;
-        State finalStartingState = state;
         Integer[] action = getRandomAction();
 
-        path.add(states[car.xt][car.yt]);
         // While we have yet to reach 'F' use SARSA to continue to search
         while (!done) {
             done = isDone(t);
             newState = nextState(currentState, action);
-            path.add(newState);
             t.getTrack()[state.xLoc][state.yLoc] = '.';
             t.getTrack()[newState.xLoc][newState.yLoc] = 'C';
-            printTrack(t);
+            // printTrack(t);
             reward = newState.getReward();
 
             Integer[] action2 = newAction(newState, state);
@@ -170,34 +235,22 @@ public class SARSA implements RaceBehavior {
             newState.setQvalue(finalQ);
 
             if (reward == -10) {
-                //crash();keep count
-
                 t.getTrack()[state.xLoc][state.yLoc] = '.';
                 t.getTrack()[newState.xLoc][newState.yLoc] = '#';
                 state.setQvalue(finalQ);
                 newState.setQvalue(reward);
                 newState = startingState;
-                //done = isDone(previousStates, states);
-            } else // update stateReward
-             if (reward == 100) {
-                    // We found a path the the finish. move backwards from original start and continue
-                    newState = moveBackwards(startingState, t);
-                    startingState = newState;
-                    //done = isDone(previousStates, states);
+            } else if (reward == 100) {
+                // We found a path the the finish. move backwards from original start and continue
+                newState = moveBackwards(startingState, t);
+                startingState = newState;
 
-                }
+            }
 
-//            if (t.getTrack()[newState.xLoc][newState.yLoc] == 'S') {
-//                t.getTrack()[newState.xLoc][newState.yLoc] = '.';
-//                state = finalStartingState;
-//            } else {
-
-                state = newState;
-            //}
+            state = newState;
             currentState[0] = state.xLoc;
             currentState[1] = state.yLoc;
             action = action2;
-            //if final state done == true
 
         }
     }
