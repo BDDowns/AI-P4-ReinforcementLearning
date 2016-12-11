@@ -8,6 +8,7 @@ import java.util.Random;
  * @author group22
  */
 public class Race {
+    private boolean finished;
     private Integer[][][] policy;
     private Car car;
     private Track t;
@@ -24,6 +25,7 @@ public class Race {
     public void start() {
         setStart();
         setCar();
+        this.finished = false;
         race();
     }
     
@@ -39,7 +41,28 @@ public class Race {
     }
     
     private void race() {
+        // init score
+        double score = 0;
         
+        while (!finished) {
+            // decrease score per time step
+            score -= 0.1;
+            // extract policy at xt, yt
+            car.accelY(policy[car.yt][car.xt][0]);
+            car.accelX(policy[car.yt][car.xt][1]);
+            
+            // update car with last accel
+            car.updatePosition();
+            
+            // check for crash condition
+            if (crashCheck()) {
+                car.carCrash();
+            }
+        }
+    }
+    
+    private boolean crashCheck() {
+        return false;
     }
     
     private void setStart() {
@@ -83,6 +106,8 @@ public class Race {
             }
         }
     }
+    
+    
     
     private void printTrack() {
         
