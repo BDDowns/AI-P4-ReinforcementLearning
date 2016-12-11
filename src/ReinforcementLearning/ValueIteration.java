@@ -13,7 +13,7 @@ public class ValueIteration implements RaceBehavior {
     double[][] value;
     double[][] value_1;
     double[][] reward;
-    Integer[][][] bestAction;
+    Integer[][][] policy;
     Track t;
     Car c;
     boolean close;
@@ -26,10 +26,10 @@ public class ValueIteration implements RaceBehavior {
         value = new double[track.length][track[0].length];
         value_1 = new double[track.length][track[0].length];
         reward = new double[track.length][track[0].length];
-        bestAction = new Integer[track.length][track[0].length][2];
+        policy = new Integer[track.length][track[0].length][2];
         this.c = c;
         place_Values();
-       // setNearFinish();
+        setNearFinish();
         setActions();
         do_Calc();
     }
@@ -40,7 +40,7 @@ public class ValueIteration implements RaceBehavior {
             for (int j = 0; j < track[0].length; j++) {
                 if (track[i][j] == 'F') {
                     value[i][j] = 1;
-                    reward[i][j] = 0;
+                    reward[i][j] = 5;
                 }
                 if (track[i][j] == '#') {
                     value[i][j] = -1;
@@ -196,7 +196,7 @@ public class ValueIteration implements RaceBehavior {
                     // evaluate current bestMove against other move that got here
                     if (calculateUtility(move, i, j) > calculateUtility(bestMove, i, j)) {
                         bestMove = move;
-                        bestAction[i][j] = bestMove;
+                        policy[i][j] = bestMove;
                         max = calculateUtility(move, i, j);
                     }
                 }
@@ -227,7 +227,7 @@ public class ValueIteration implements RaceBehavior {
             for (int j = 0; j < track[0].length; j++) {
                 if (track[i][j] == '.') {
                     System.out.format("Coordinate: (%d, %d) - Move: Y(%d), X(%d) "
-                            ,i, j, bestAction[i][j][0], bestAction[i][j][1]);
+                            ,i, j, policy[i][j][0], policy[i][j][1]);
                 }
             }
             System.out.println();
