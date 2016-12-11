@@ -1,6 +1,7 @@
 package ReinforcementLearning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -10,7 +11,8 @@ public class ValueIteration implements RaceBehavior {
 
     //Track tk;
     static char[][] track;
-    static double[][] value;
+    double[][] value;
+    double[][] value_1;
     Track t;
     Car c;
     boolean close;
@@ -23,6 +25,7 @@ public class ValueIteration implements RaceBehavior {
         value = new double[track.length][track[0].length];
         this.c = c;
         place_Values();
+        //setNearFinish();
         setActions();
         do_Calc(value);
     }
@@ -32,7 +35,7 @@ public class ValueIteration implements RaceBehavior {
             System.out.println();
             for (int j = 0; j < track[0].length; j++) {
                 if (track[i][j] == 'F') {
-                    value[i][j] = 100;
+                    value[i][j] = 1;
                 }
                 if (track[i][j] == '#') {
                     value[i][j] = -1;
@@ -48,6 +51,29 @@ public class ValueIteration implements RaceBehavior {
 
         }
         return value;
+    }
+
+    public void setNearFinish() {
+        int y, x;
+        for (int i = 0; i < track.length; i++) {
+            for (int j = 0; j < track.length; j++) {
+                if (track[i][j] == 'F') {
+                    if (track[i - 1][j] == '.') {
+                        c.y0 = i - 1;
+                        c.x0 = j;
+                    } else if (track[i + 1][j] == '.') {
+                        c.y0 = i + 1;
+                        c.x0 = j;
+                    } else if (track[i][j - 1] == '.') {
+                        c.y0 = i;
+                        c.x0 = j - 1;
+                    } else {
+                        c.y0 = i;
+                        c.x0 = j + 1;
+                    }
+                }
+            }
+        }
     }
 
     // action list
@@ -102,26 +128,27 @@ public class ValueIteration implements RaceBehavior {
 
     //view page 652 in AI book for formula
     public void do_Calc(double[][] value) {
-        double utility = 0;
-        double delta = 0;
-        double utility_1 = 0;
-        double epsilon = 0.5;
-        double discount = 0.5;
+        double delta;
+        double[][] value_1 = new double[value.length][value[0].length];
+        cloneArray(value, value_1);
+        double epsilon = 0.001;
+        double discount = 0.75;
 
         do {
-            utility = utility_1;
+            cloneArray(value_1, value);
             delta = 0;
             for (int i = 0; i < value.length; i++) {
                 for (int j = 0; j < value[0].length; j++) {
                     if (track[i][j] == '.') {
                         // compute utility based on utility of neighbors
-                        utility_1 = value[i][j] + getMaxActionUtility(i, j);
-                        if (Math.abs(utility_1 - utility) > delta) {
-                            delta = Math.abs(utility_1 - utility);
+                        value_1[i][j] = value[i][j] + getMaxActionUtility(i, j);
+                        if (Math.abs(value_1[i][j] - value[i][j]) > delta) {
+                            delta = Math.abs(value_1[i][j] - value[i][j]);
                         }
                     }
                 }
             }
+            printValues();
         } while (delta > (epsilon * (1 - discount) / discount));
 
     }
@@ -129,7 +156,7 @@ public class ValueIteration implements RaceBehavior {
     // return max Sigma(s1) P(s1 | s, a) * U[s1]
     public double getMaxActionUtility(int i, int j) {
         Integer[] move;
-        double max = -1000;
+        double max = -1;
         for (int k = 0; k < actions.size(); k++) {
             // make sure not out of bounds
             move = actions.get(k);
@@ -139,4 +166,22 @@ public class ValueIteration implements RaceBehavior {
         return max;
     }
 
+    public void printValues() {
+        for (int i = 0; i < value.length; i++) {
+            for (int j = 0; j < value[0].length; j++) {
+                if (track[i][j] == '.' || track[i][j] == 'F') {
+                    System.out.format("%3d ", (int)value[i][j]);
+                }
+            }
+            System.out.println();
+        }
+    }
+    
+    public void cloneArray(double[][] original, double[][] target) {
+        for (int i = 0; i < original.length; i++) {
+            for (int j = 0; j < original[0].length; j++) {
+                target[i][j] = original[i][j];
+            }
+        }
+    }
 }
