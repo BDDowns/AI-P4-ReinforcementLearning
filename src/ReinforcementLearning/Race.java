@@ -17,17 +17,23 @@ public class Race {
     private ArrayList<Integer[]> startingLine = new ArrayList<>();
     private int crashCount = 0;
 
+    /**
+     * Constructor for race requires a policy, car, and track
+     * @param policy 
+     * @param car
+     * @param t 
+     */
     public Race(Integer[][][] policy, Car car, Track t) {
         this.policy = policy;
         this.car = car;
         this.t = t;
         this.track = t.getTrack();
-        for (int i = 0; i < policy.length; i++) {
-            for (int j = 0; j < policy[0].length; j++) {
-                System.out.format("y(%d), x(%d)", policy[i][j][0], policy[i][j][1]);
-            }
-            System.out.println();
-        }
+//        for (int i = 0; i < policy.length; i++) {
+//            for (int j = 0; j < policy[0].length; j++) {
+//                System.out.format("y(%d), x(%d)", policy[i][j][0], policy[i][j][1]);
+//            }
+//            System.out.println();
+//        }
 
 //        this.policy = new Integer[policy.length][policy[0].length][2];
 //        for (int i = 0; i < policy.length; i++) {
@@ -38,13 +44,20 @@ public class Race {
 //        }
     }
 
+    /**
+     * Starts the race
+     */
     public void start() {
         setStart();
         setCar();
         this.finished = false;
+//        car.setCrashBehavior(new BackToBeginning());
         race();
     }
 
+    /**
+     * set the car at a random starting location
+     */
     private void setCar() {
         // Randomize position on starting line
 
@@ -58,11 +71,15 @@ public class Race {
         car.xt = startingLine.get(index)[1];
     }
 
+    /**
+     * Race logic
+     */
     private void race() {
         // init score
         double score = 0;
         
         while (!finished) {
+//            printTrack();
             // decrease score per time step
             score -= 0.1;
             // make movement fail 20% of the time
@@ -179,6 +196,7 @@ public class Race {
                                 || x_pos < 0 || track[y_pos][x_pos] == '#') {
                             this.car.updatePosition();
                             this.car.carCrash();
+                            this.crashCount++;
                         } else if (track[y_pos][x_pos] == 'F') {
                             this.finished = true;
                         }
@@ -195,6 +213,7 @@ public class Race {
                             || x_pos < 0 || track[y_pos][x_pos] == '#') {
                         this.car.updatePosition();
                         this.car.carCrash();
+                        this.crashCount++;
                     } else if (track[y_pos][x_pos] == 'F') {
                         this.finished = true;
                     }
@@ -299,6 +318,10 @@ public class Race {
         car.updatePosition();
     }
 
+    /**
+     * Find and add coordinates for the starting positions of the track to an
+     * array list
+     */
     private void setStart() {
         Integer[] s1 = new Integer[2];
         Integer[] s2 = new Integer[2];
@@ -340,7 +363,10 @@ public class Race {
             }
         }
     }
-
+    
+    /**
+     * print the track with the car position on it to show position at time t
+     */
     private void printTrack() {
         for (int i = 0; i < track.length; i++) {
             for (int j = 0; j < track[0].length; j++) {

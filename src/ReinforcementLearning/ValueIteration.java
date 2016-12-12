@@ -29,13 +29,17 @@ public class ValueIteration implements RaceBehavior {
         policy = new Integer[track.length][track[0].length][2];
         this.c = c;
         place_Values();
-        setNearFinish();
+//        setNearFinish();
         setActions();
         do_Calc();
         Race race = new Race(policy, c, t);
         race.start();
     }
 
+    /**
+     * Places values in the value array and reward values per location on the track
+     * @return value array
+     */
     public double[][] place_Values() {
         for (int i = 0; i < track.length; i++) {
             System.out.println();
@@ -63,6 +67,11 @@ public class ValueIteration implements RaceBehavior {
         return value;
     }
 
+    /**
+     * method for testing the effect of placing the car near a finish location
+     * on the generated policy to ensure policy is identical regardless of starting
+     * location
+     */
     public void setNearFinish() {
         for (int i = 0; i < track.length; i++) {
             for (int j = 0; j < track[0].length; j++) {
@@ -85,7 +94,9 @@ public class ValueIteration implements RaceBehavior {
         }
     }
 
-    // action list
+    /**
+     * List of possible moves
+     */
     public void setActions() {
         // north goes up...
         Integer[] n = new Integer[2];
@@ -135,12 +146,14 @@ public class ValueIteration implements RaceBehavior {
         this.actions.add(none);
     }
 
-    //view page 652 in AI book for formula
+    /**
+     * Main method for ValueIteration -- Actual value calculation takes place here
+     */
     public void do_Calc() {
         double delta;
         cloneArray(this.value, value_1);
-        double epsilon = 0.001;
-        double discount = 0.9;
+        double epsilon = 0.0001;
+        double discount = .9;
 
         do {
             cloneArray(value_1, this.value);
@@ -160,8 +173,8 @@ public class ValueIteration implements RaceBehavior {
         } while (delta > (epsilon * (1 - discount) / discount));
         
         // print final array
-//        printValues();
-//        printMoves();
+        printValues();
+        printMoves();
     }
 
     /**
@@ -216,6 +229,9 @@ public class ValueIteration implements RaceBehavior {
         }
     }
 
+    /**
+     * print the value array
+     */
     public void printValues() {
         // print out the track in a better way
         for (int i = 0; i < this.value.length; i++) {
@@ -226,11 +242,14 @@ public class ValueIteration implements RaceBehavior {
         }
     }
     
+    /**
+     * print the policy array
+     */
     public void printMoves() {
         for (int i = 0; i < track.length; i++) {
             for (int j = 0; j < track[0].length; j++) {
                 if (track[i][j] == '.') {
-                    System.out.format("Coordinate: (%d, %d) - Move: Y(%d), X(%d) "
+                    System.out.format("Pos (%d, %d) Accel Y(%d) X(%d). "
                             ,i, j, policy[i][j][0], policy[i][j][1]);
                 }
             }
@@ -238,6 +257,11 @@ public class ValueIteration implements RaceBehavior {
         }
     }
 
+    /**
+     * Clones first array into the second array
+     * @param master array to be cloned
+     * @param clone target of the cloned array
+     */
     public void cloneArray(double[][] master, double[][] clone) {
         for (int i = 0; i < master.length; i++) {
             for (int j = 0; j < master[0].length; j++) {
@@ -246,6 +270,13 @@ public class ValueIteration implements RaceBehavior {
         }
     }
     
+    /**
+     * Calculate the utility of a move given a position i, j
+     * @param move Integer[] array of size 2
+     * @param i integer value for the y position
+     * @param j integer value for the x position
+     * @return double value for the utility of the given move
+     */
     public double calculateUtility(Integer[] move, int i, int j) {
         double probWorks = 0.8;
         
