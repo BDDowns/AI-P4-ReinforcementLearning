@@ -61,14 +61,17 @@ public class Race {
     private void race() {
         // init score
         double score = 0;
-
+        
         while (!finished) {
             // decrease score per time step
             score -= 0.1;
+            // make movement fail 20% of the time
+            double r = Math.random();
             // extract policy at xt, yt
-            car.accelY(policy[car.yt][car.xt][0]);
-            car.accelX(policy[car.yt][car.xt][1]);
-
+            if (r < 0.8) {
+                car.accelY(policy[car.yt][car.xt][0]);
+                car.accelX(policy[car.yt][car.xt][1]);
+            }
             // evaluate vector and update car if possible
             vectorCheck();
             if (this.finished) {
