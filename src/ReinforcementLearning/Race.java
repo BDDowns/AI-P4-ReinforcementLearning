@@ -28,7 +28,7 @@ public class Race {
             }
             System.out.println();
         }
-        
+
 //        this.policy = new Integer[policy.length][policy[0].length][2];
 //        for (int i = 0; i < policy.length; i++) {
 //            for (int j = 0; j < policy[0].length; j++) {
@@ -66,7 +66,7 @@ public class Race {
             // decrease score per time step
             score -= 0.1;
             printTrack();
-            System.out.println("Crashes: " + crashCount);
+            System.out.println("Score: " + score + "Crashes: " + crashCount);
             // extract policy at xt, yt
             car.accelY(policy[car.yt][car.xt][0]);
             car.accelX(policy[car.yt][car.xt][1]);
@@ -88,8 +88,8 @@ public class Race {
         int x_speed = car.x_speed;
 
         // check if off the track
-        if (y_pos + y_speed > track.length || y_pos + y_speed < 0
-                || x_pos + x_speed > track[0].length || x_pos + x_speed < 0) {
+        if (y_pos + y_speed >= track.length || y_pos + y_speed < 0
+                || x_pos + x_speed >= track[0].length || x_pos + x_speed < 0) {
             // update car position and crash
             this.car.updatePosition();
             this.car.carCrash();
@@ -106,12 +106,13 @@ public class Race {
                     y_pos++;
                     y_speed--;
                     // see if this move won the race...
-                    if (track[y_pos][x_pos] == 'F') {
-                        this.finished = true;
-                    } else if (track[y_pos][x_pos] == '#') {
+                    if (y_pos >= track.length || y_pos < 0 || x_pos >= track[0].length
+                            || x_pos < 0 || track[y_pos][x_pos] == '#') {
                         this.car.updatePosition();
                         this.car.carCrash();
                         this.crashCount++;
+                    } else if (track[y_pos][x_pos] == 'F') {
+                        this.finished = true;
                     }
                     // repeat until y direction exhausted
                     while (y_speed > 0) {
@@ -129,7 +130,8 @@ public class Race {
                             }
                         }
                         // check destination for crash, finish, etc.
-                        if (track[y_pos][x_pos] == '#') {
+                        if (y_pos >= track.length || y_pos < 0 || x_pos >= track[0].length
+                                || x_pos < 0 || track[y_pos][x_pos] == '#') {
                             this.car.updatePosition();
                             this.car.carCrash();
                             this.crashCount++;
@@ -143,6 +145,12 @@ public class Race {
                     y_pos--;
                     y_speed++;
                     // see if this move won the race...
+                    if (y_pos >= track.length || y_pos < 0 || x_pos >= track[0].length
+                            || x_pos < 0 || track[y_pos][x_pos] == '#') {
+                        this.car.updatePosition();
+                        this.car.carCrash();
+                        this.crashCount++;
+                    }
                     if (track[y_pos][x_pos] == 'F') {
                         this.finished = true;
                     }
@@ -162,7 +170,8 @@ public class Race {
                             }
                         }
                         // check destination for crash, finish, etc.
-                        if (track[y_pos][x_pos] == '#') {
+                        if (y_pos >= track.length || y_pos < 0 || x_pos >= track[0].length
+                                || x_pos < 0 || track[y_pos][x_pos] == '#') {
                             this.car.updatePosition();
                             this.car.carCrash();
                         } else if (track[y_pos][x_pos] == 'F') {
@@ -177,11 +186,12 @@ public class Race {
                     x_pos++;
                     x_speed--;
                     // see if this move won the race...a
-                    if (track[y_pos][x_pos] == 'F') {
-                        this.finished = true;
-                    } else if (track[y_pos][x_pos] == '#') {
+                    if (y_pos >= track.length || y_pos < 0 || x_pos >= track[0].length
+                            || x_pos < 0 || track[y_pos][x_pos] == '#') {
                         this.car.updatePosition();
                         this.car.carCrash();
+                    } else if (track[y_pos][x_pos] == 'F') {
+                        this.finished = true;
                     }
                     // repeat until x direction exhausted
                     while (x_speed > 0) {
@@ -199,7 +209,8 @@ public class Race {
                             }
                         }
                         // check destination for crash, finish, etc.
-                        if (track[y_pos][x_pos] == '#') {
+                        if (y_pos >= track.length || y_pos < 0 || x_pos >= track[0].length
+                                || x_pos < 0 || track[y_pos][x_pos] == '#') {
                             this.car.updatePosition();
                             this.car.carCrash();
                             this.crashCount++;
@@ -213,13 +224,14 @@ public class Race {
                     x_pos--;
                     x_speed++;
                     // see if this move won the race...
-                    if (track[y_pos][x_pos] == 'F') {
-                        this.finished = true;
-                    }
-                    if (track[y_pos][x_pos] == '#') {
+                    if (y_pos >= track.length || y_pos < 0 || x_pos >= track[0].length
+                            || x_pos < 0 || track[y_pos][x_pos] == '#') {
                         this.car.updatePosition();
                         this.car.carCrash();
                         this.crashCount++;
+                    }
+                    if (track[y_pos][x_pos] == 'F') {
+                        this.finished = true;
                     }
                     // repeat until y direction exhausted
                     while (x_speed < 0) {
@@ -237,7 +249,8 @@ public class Race {
                             }
                         }
                         // check destination for crash, finish, etc.
-                        if (track[y_pos][x_pos] == '#') {
+                        if (y_pos >= track.length || y_pos < 0 || x_pos >= track[0].length
+                                || x_pos < 0 || track[y_pos][x_pos] == '#') {
                             this.car.updatePosition();
                             this.car.carCrash();
                             this.crashCount++;
@@ -253,8 +266,7 @@ public class Race {
                     if (x_speed > 0) {
                         x_pos++;
                         x_speed--;
-                    }
-                    // x < 0
+                    } // x < 0
                     else {
                         x_pos--;
                         x_speed++;
@@ -263,18 +275,18 @@ public class Race {
                     if (y_speed > 0) {
                         y_pos++;
                         y_speed--;
-                    } 
-                    // y < 0
+                    } // y < 0
                     else {
                         y_pos--;
                         y_speed++;
                     }
-                    if (track[y_pos][x_pos] == 'F') {
-                        this.finished = true;
-                    } else if (track[y_pos][x_pos] == '#') {
+                    if (y_pos >= track.length || y_pos < 0 || x_pos >= track[0].length
+                            || x_pos < 0 || track[y_pos][x_pos] == '#') {
                         this.car.updatePosition();
                         this.car.carCrash();
                         this.crashCount++;
+                    } else if (track[y_pos][x_pos] == 'F') {
+                        this.finished = true;
                     }
                 }
             }

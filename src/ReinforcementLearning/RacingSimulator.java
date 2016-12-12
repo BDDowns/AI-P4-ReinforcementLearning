@@ -42,8 +42,8 @@ public class RacingSimulator {
                 1. Set <car>.setCrashBehavior(<CrashBehavior>)
                 2. Run <car>.carRace(<track>)
         */
-        racecar.setCrashBehavior(new BackToBeginning());
-        racecar.carRace(r_track);
+//        racecar.setCrashBehavior(new BackToBeginning());
+//        racecar.carRace(r_track);
         
         /*
             One more time through to test BacktoBeginning
