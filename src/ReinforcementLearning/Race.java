@@ -8,42 +8,43 @@ import java.util.Random;
  * @author group22
  */
 public class Race {
+
     private boolean finished;
     private Integer[][][] policy;
     private Car car;
     private Track t;
     private char[][] track;
     private ArrayList<Integer[]> startingLine;
-    
-    public Race (Integer[][][] policy, Car car, Track t) {
+
+    public Race(Integer[][][] policy, Car car, Track t) {
         this.policy = policy;
         this.car = car;
         this.t = t;
         this.track = t.getTrack();
     }
-    
+
     public void start() {
         setStart();
         setCar();
         this.finished = false;
         race();
     }
-    
+
     private void setCar() {
         // Randomize position on starting line
-        
-        Random r =  new Random();
+
+        Random r = new Random();
         int index = r.nextInt(startingLine.size());
-        
+
         // set car at selected start
         car.y0 = startingLine.get(index)[0];
         car.x0 = startingLine.get(index)[1];
     }
-    
+
     private void race() {
         // init score
         double score = 0;
-        
+
         while (!finished) {
             // decrease score per time step
             score -= 0.1;
@@ -51,53 +52,223 @@ public class Race {
             // extract policy at xt, yt
             car.accelY(policy[car.yt][car.xt][0]);
             car.accelX(policy[car.yt][car.xt][1]);
-            
-            // update car with last accel
-            car.updatePosition();
-            
-            // check for crash condition
-            if (vectorCheck()) {
-                car.carCrash();
-            }
-        }
-    }
-    
-    private boolean vectorCheck() {
-        // check if off the track
-        if (car.yt > track.length || car.yt < 0 || car.xt > track[0].length || 
-                car.xt < 0) {
-            return true;
-        // check if crossed the finish line
-        } else {
-            if (car.y_speed > car.x_speed) {
-                // go y first and check positions of the vector
 
-                return false;
-            } else if (car.y_speed < car.x_speed) {
+            // evaluate vector and update car if possible
+            vectorCheck();
+        }
+    }
+
+    /**
+     * vectorChecker is a big ugly beast of a method. It checks each increment
+     * of a vector with a directional magnitude bias and looks for 'F' and '#'.
+     */
+    private void vectorCheck() {
+        // create temp variables for new position of the car
+        int y_pos = car.y_speed + car.yt;
+        int x_pos = car.x_speed + car.xt;
+        int y_speed = car.y_speed;
+        int x_speed = car.x_speed;
+
+        // check if off the track
+        if (y_pos > track.length || y_pos < 0
+                || x_pos > track[0].length || x_pos < 0) {
+            // update car position and crash
+            car.updatePosition();
+            car.carCrash();
+            // check if crossed the finish line
+        } else {
+            // directional magnitude bias to determine crash
+            // if below condition holds y cannot be zero
+            if (Math.abs(car.y_speed) > Math.abs(car.x_speed)) {
+                // go y first and check positions of the vector
+                // check which direction to iterate
+                if (y_speed > 0) {
+                    // process first part of vector step
+                    y_pos++;
+                    y_speed--;
+                    // see if this move won the race...
+                    if (track[y_pos][x_pos] == 'F') {
+                        this.finished = true;
+                    } else if (track[y_pos][x_pos] == '#') {
+                        car.updatePosition();
+                        car.carCrash();
+                    }
+                    // repeat until y direction exhausted
+                    while (y_speed > 0) {
+                        y_pos++;
+                        y_speed--;
+                        if (x_speed != 0) {
+                            // pos x
+                            if (x_speed > 0) {
+                                x_pos++;
+                                x_speed--;
+                                // neg x
+                            } else {
+                                x_pos--;
+                                x_speed++;
+                            }
+                        }
+                        // check destination for crash, finish, etc.
+                        if (track[y_pos][x_pos] == '#') {
+                            car.updatePosition();
+                            car.carCrash();
+                        } else if (track[y_pos][x_pos] == 'F') {
+                            this.finished = true;
+                        }
+                    }
+                    // otherwise y is negative
+                } else {
+                    // process first part of vector step
+                    y_pos--;
+                    y_speed++;
+                    // see if this move won the race...
+                    if (track[y_pos][x_pos] == 'F') {
+                        this.finished = true;
+                    }
+                    // repeat until y direction exhausted
+                    while (y_speed < 0) {
+                        y_pos--;
+                        y_speed++;
+                        if (x_speed != 0) {
+                            // pos x
+                            if (x_speed > 0) {
+                                x_pos--;
+                                x_speed++;
+                                // neg x
+                            } else {
+                                x_pos++;
+                                x_speed--;
+                            }
+                        }
+                        // check destination for crash, finish, etc.
+                        if (track[y_pos][x_pos] == '#') {
+                            car.updatePosition();
+                            car.carCrash();
+                        } else if (track[y_pos][x_pos] == 'F') {
+                            this.finished = true;
+                        }
+                    }
+                }
+            } else if (Math.abs(car.y_speed) < Math.abs(car.x_speed)) {
                 // go x first and check positions of the vector
-                
-                return false;
+                if (x_speed > 0) {
+                    // process first part of vector step
+                    x_pos++;
+                    x_speed--;
+                    // see if this move won the race...a
+                    if (track[y_pos][x_pos] == 'F') {
+                        this.finished = true;
+                    } else if (track[y_pos][x_pos] == '#') {
+                        car.updatePosition();
+                        car.carCrash();
+                    }
+                    // repeat until x direction exhausted
+                    while (x_speed > 0) {
+                        x_pos++;
+                        x_speed--;
+                        if (y_speed != 0) {
+                            // pos x
+                            if (y_speed > 0) {
+                                y_pos++;
+                                y_speed--;
+                                // neg x
+                            } else {
+                                y_pos--;
+                                y_speed++;
+                            }
+                        }
+                        // check destination for crash, finish, etc.
+                        if (track[y_pos][x_pos] == '#') {
+                            car.updatePosition();
+                            car.carCrash();
+                        } else if (track[y_pos][x_pos] == 'F') {
+                            this.finished = true;
+                        }
+                    }
+                    // otherwise x is negative
+                } else {
+                    // process first part of vector step
+                    x_pos--;
+                    x_speed++;
+                    // see if this move won the race...
+                    if (track[y_pos][x_pos] == 'F') {
+                        this.finished = true;
+                    }
+                    if (track[y_pos][x_pos] == '#') {
+                        car.updatePosition();
+                        car.carCrash();
+                    }
+                    // repeat until y direction exhausted
+                    while (x_speed < 0) {
+                        x_pos--;
+                        x_speed++;
+                        if (y_speed != 0) {
+                            // pos x
+                            if (y_speed > 0) {
+                                y_pos--;
+                                y_speed++;
+                                // neg x
+                            } else {
+                                y_pos++;
+                                y_speed--;
+                            }
+                        }
+                        // check destination for crash, finish, etc.
+                        if (track[y_pos][x_pos] == '#') {
+                            car.updatePosition();
+                            car.carCrash();
+                        } else if (track[y_pos][x_pos] == 'F') {
+                            this.finished = true;
+                        }
+                    }
+                }
             } else {
-                // go y and x equally and check positions of the vector
-                
-                return false;
+                // abs(y) = abs(x) -- either 0 check is fine
+                while (Math.abs(y_speed) > 0) {
+                    // x > 0
+                    if (x_speed > 0) {
+                        x_pos++;
+                        x_speed--;
+                    }
+                    // x < 0
+                    else {
+                        x_pos--;
+                        x_speed++;
+                    }
+                    // y > 0 
+                    if (y_speed > 0) {
+                        y_pos++;
+                        y_speed--;
+                    } 
+                    // y < 0
+                    else {
+                        y_pos--;
+                        y_speed++;
+                    }
+                    if (track[y_pos][x_pos] == 'F') {
+                        this.finished = true;
+                    } else if (track[y_pos][x_pos] == '#') {
+                        car.updatePosition();
+                        car.carCrash();
+                    }
+                }
             }
         }
     }
-    
+
     private void setStart() {
         Integer[] s1 = new Integer[2];
         Integer[] s2 = new Integer[2];
         Integer[] s3 = new Integer[2];
         Integer[] s4 = new Integer[2];
-        
+
         int count = 1;
-        
+
         for (int i = 0; i < track.length; i++) {
             for (int j = 0; j < track[0].length; j++) {
                 if (track[i][j] == 'S') {
                     switch (count) {
-                        case 1: 
+                        case 1:
                             s1[0] = i;
                             s1[1] = j;
                             startingLine.add(s1);
@@ -109,7 +280,7 @@ public class Race {
                             startingLine.add(s2);
                             count++;
                             break;
-                        case 3: 
+                        case 3:
                             s3[0] = i;
                             s3[1] = j;
                             startingLine.add(s3);
@@ -126,9 +297,7 @@ public class Race {
             }
         }
     }
-    
-    
-    
+
     private void printTrack() {
         for (int i = 0; i < track.length; i++) {
             for (int j = 0; j < track[0].length; j++) {
