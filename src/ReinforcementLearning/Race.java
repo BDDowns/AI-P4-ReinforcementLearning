@@ -28,20 +28,6 @@ public class Race {
         this.car = car;
         this.t = t;
         this.track = t.getTrack();
-//        for (int i = 0; i < policy.length; i++) {
-//            for (int j = 0; j < policy[0].length; j++) {
-//                System.out.format("y(%d), x(%d)", policy[i][j][0], policy[i][j][1]);
-//            }
-//            System.out.println();
-//        }
-
-//        this.policy = new Integer[policy.length][policy[0].length][2];
-//        for (int i = 0; i < policy.length; i++) {
-//            for (int j = 0; j < policy[0].length; j++) {
-//                this.policy[i][j][0] = policy[i][j][0];
-//                this.policy[i][j][1] = policy[i][j][1];
-//            }
-//        }
     }
 
     /**
