@@ -41,7 +41,7 @@ public class ValueIteration implements RaceBehavior {
             System.out.println();
             for (int j = 0; j < track[0].length; j++) {
                 if (track[i][j] == 'F') {
-                    value[i][j] = 1;
+                    value[i][j] = 5;
                     reward[i][j] = 5;
                 }
                 if (track[i][j] == '#') {
@@ -49,11 +49,12 @@ public class ValueIteration implements RaceBehavior {
                     reward[i][j] = -1;
                 }
                 if (track[i][j] == '.') {
-                    value[i][j] = 0;
+                    value[i][j] = -0.1;
                     reward[i][j] = -0.1;
                 }
                 if (track[i][j] == 'S') {
-                    value[i][j] = 0;
+                    value[i][j] = -1;
+                    reward[i][j] = -1;
                 }
 //                System.out.print(value[i][j] + " ");
             }
@@ -139,14 +140,14 @@ public class ValueIteration implements RaceBehavior {
         double delta;
         cloneArray(this.value, value_1);
         double epsilon = 0.001;
-        double discount = 1;
+        double discount = 0.9;
 
         do {
             cloneArray(value_1, this.value);
             delta = 0;
             for (int i = 0; i < track.length; i++) {
                 for (int j = 0; j < track[0].length; j++) {
-                    if (track[i][j] == '.') {
+                    if (track[i][j] == '.' || track[i][j] == 'S') {
                         // compute utility based on utility of neighbors     
                         value_1[i][j] = reward[i][j] + discount * getMaxActionUtility(i, j);
                         if (Math.abs(value_1[i][j] - value[i][j]) > delta) {
@@ -159,8 +160,8 @@ public class ValueIteration implements RaceBehavior {
         } while (delta > (epsilon * (1 - discount) / discount));
         
         // print final array
-        printValues();
-        printMoves();
+//        printValues();
+//        printMoves();
     }
 
     /**
@@ -174,8 +175,6 @@ public class ValueIteration implements RaceBehavior {
      */
     public double getMaxActionUtility(int i, int j) {
         Integer[] move;
-        // because java can't follow my logic of bestMove being initialized before
-        // the else below...
         Integer[] bestMove = actions.get(0);
         boolean hasMove = false;
         double max = 0;
@@ -190,6 +189,7 @@ public class ValueIteration implements RaceBehavior {
                     c.x_speed + move[1] + j > 0) {
                 // if in here the move doesn't go completely off the track
                 // if first time in here set the best move to move that got us here
+                this.policy[i][j] = bestMove;
                 if (!hasMove) {
                     bestMove = move;
                     max = calculateUtility(move, i, j);
@@ -207,6 +207,8 @@ public class ValueIteration implements RaceBehavior {
             } 
         }
         if (hasMove) {
+//            c.accelY(bestMove[0]);
+//            c.accelX(bestMove[1]);
             return max;
         } else {
             c.carCrash();

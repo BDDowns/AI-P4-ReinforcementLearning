@@ -15,13 +15,19 @@ public class Race {
     private Track t;
     private char[][] track;
     private ArrayList<Integer[]> startingLine = new ArrayList<>();
+    private int crashCount = 0;
 
     public Race(Integer[][][] policy, Car car, Track t) {
         this.policy = policy;
         this.car = car;
         this.t = t;
         this.track = t.getTrack();
-        
+        for (int i = 0; i < policy.length; i++) {
+            for (int j = 0; j < policy[0].length; j++) {
+                System.out.format("y(%d), x(%d)", policy[i][j][0], policy[i][j][1]);
+            }
+            System.out.println();
+        }
         
 //        this.policy = new Integer[policy.length][policy[0].length][2];
 //        for (int i = 0; i < policy.length; i++) {
@@ -60,6 +66,7 @@ public class Race {
             // decrease score per time step
             score -= 0.1;
             printTrack();
+            System.out.println("Crashes: " + crashCount);
             // extract policy at xt, yt
             car.accelY(policy[car.yt][car.xt][0]);
             car.accelX(policy[car.yt][car.xt][1]);
@@ -75,17 +82,18 @@ public class Race {
      */
     private void vectorCheck() {
         // create temp variables for new position of the car
-        int y_pos = car.y_speed + car.yt;
-        int x_pos = car.x_speed + car.xt;
+        int y_pos = car.yt;
+        int x_pos = car.xt;
         int y_speed = car.y_speed;
         int x_speed = car.x_speed;
 
         // check if off the track
-        if (y_pos > track.length || y_pos < 0
-                || x_pos > track[0].length || x_pos < 0) {
+        if (y_pos + y_speed > track.length || y_pos + y_speed < 0
+                || x_pos + x_speed > track[0].length || x_pos + x_speed < 0) {
             // update car position and crash
-            car.updatePosition();
-            car.carCrash();
+            this.car.updatePosition();
+            this.car.carCrash();
+            this.crashCount++;
             // check if crossed the finish line
         } else {
             // directional magnitude bias to determine crash
@@ -101,8 +109,9 @@ public class Race {
                     if (track[y_pos][x_pos] == 'F') {
                         this.finished = true;
                     } else if (track[y_pos][x_pos] == '#') {
-                        car.updatePosition();
-                        car.carCrash();
+                        this.car.updatePosition();
+                        this.car.carCrash();
+                        this.crashCount++;
                     }
                     // repeat until y direction exhausted
                     while (y_speed > 0) {
@@ -121,8 +130,9 @@ public class Race {
                         }
                         // check destination for crash, finish, etc.
                         if (track[y_pos][x_pos] == '#') {
-                            car.updatePosition();
-                            car.carCrash();
+                            this.car.updatePosition();
+                            this.car.carCrash();
+                            this.crashCount++;
                         } else if (track[y_pos][x_pos] == 'F') {
                             this.finished = true;
                         }
@@ -153,8 +163,8 @@ public class Race {
                         }
                         // check destination for crash, finish, etc.
                         if (track[y_pos][x_pos] == '#') {
-                            car.updatePosition();
-                            car.carCrash();
+                            this.car.updatePosition();
+                            this.car.carCrash();
                         } else if (track[y_pos][x_pos] == 'F') {
                             this.finished = true;
                         }
@@ -170,8 +180,8 @@ public class Race {
                     if (track[y_pos][x_pos] == 'F') {
                         this.finished = true;
                     } else if (track[y_pos][x_pos] == '#') {
-                        car.updatePosition();
-                        car.carCrash();
+                        this.car.updatePosition();
+                        this.car.carCrash();
                     }
                     // repeat until x direction exhausted
                     while (x_speed > 0) {
@@ -190,8 +200,9 @@ public class Race {
                         }
                         // check destination for crash, finish, etc.
                         if (track[y_pos][x_pos] == '#') {
-                            car.updatePosition();
-                            car.carCrash();
+                            this.car.updatePosition();
+                            this.car.carCrash();
+                            this.crashCount++;
                         } else if (track[y_pos][x_pos] == 'F') {
                             this.finished = true;
                         }
@@ -206,8 +217,9 @@ public class Race {
                         this.finished = true;
                     }
                     if (track[y_pos][x_pos] == '#') {
-                        car.updatePosition();
-                        car.carCrash();
+                        this.car.updatePosition();
+                        this.car.carCrash();
+                        this.crashCount++;
                     }
                     // repeat until y direction exhausted
                     while (x_speed < 0) {
@@ -226,8 +238,9 @@ public class Race {
                         }
                         // check destination for crash, finish, etc.
                         if (track[y_pos][x_pos] == '#') {
-                            car.updatePosition();
-                            car.carCrash();
+                            this.car.updatePosition();
+                            this.car.carCrash();
+                            this.crashCount++;
                         } else if (track[y_pos][x_pos] == 'F') {
                             this.finished = true;
                         }
@@ -259,12 +272,14 @@ public class Race {
                     if (track[y_pos][x_pos] == 'F') {
                         this.finished = true;
                     } else if (track[y_pos][x_pos] == '#') {
-                        car.updatePosition();
-                        car.carCrash();
+                        this.car.updatePosition();
+                        this.car.carCrash();
+                        this.crashCount++;
                     }
                 }
             }
         }
+        car.updatePosition();
     }
 
     private void setStart() {
