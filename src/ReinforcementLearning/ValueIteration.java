@@ -32,6 +32,8 @@ public class ValueIteration implements RaceBehavior {
         setNearFinish();
         setActions();
         do_Calc();
+        Race race = new Race(policy, c, t);
+        race.start();
     }
 
     public double[][] place_Values() {
@@ -196,7 +198,7 @@ public class ValueIteration implements RaceBehavior {
                     // evaluate current bestMove against other move that got here
                     if (calculateUtility(move, i, j) > calculateUtility(bestMove, i, j)) {
                         bestMove = move;
-                        policy[i][j] = bestMove;
+                        this.policy[i][j] = bestMove;
                         max = calculateUtility(move, i, j);
                     }
                 }

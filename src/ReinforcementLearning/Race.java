@@ -14,13 +14,22 @@ public class Race {
     private Car car;
     private Track t;
     private char[][] track;
-    private ArrayList<Integer[]> startingLine;
+    private ArrayList<Integer[]> startingLine = new ArrayList<>();
 
     public Race(Integer[][][] policy, Car car, Track t) {
         this.policy = policy;
         this.car = car;
         this.t = t;
         this.track = t.getTrack();
+        
+        
+//        this.policy = new Integer[policy.length][policy[0].length][2];
+//        for (int i = 0; i < policy.length; i++) {
+//            for (int j = 0; j < policy[0].length; j++) {
+//                this.policy[i][j][0] = policy[i][j][0];
+//                this.policy[i][j][1] = policy[i][j][1];
+//            }
+//        }
     }
 
     public void start() {
@@ -38,7 +47,9 @@ public class Race {
 
         // set car at selected start
         car.y0 = startingLine.get(index)[0];
+        car.yt = startingLine.get(index)[0];
         car.x0 = startingLine.get(index)[1];
+        car.xt = startingLine.get(index)[1];
     }
 
     private void race() {
@@ -276,7 +287,7 @@ public class Race {
                             break;
                         case 2:
                             s2[0] = i;
-                            s2[0] = j;
+                            s2[1] = j;
                             startingLine.add(s2);
                             count++;
                             break;
@@ -288,7 +299,7 @@ public class Race {
                             break;
                         case 4:
                             s4[0] = i;
-                            s4[0] = j;
+                            s4[1] = j;
                             startingLine.add(s4);
                             count++;
                             break;
