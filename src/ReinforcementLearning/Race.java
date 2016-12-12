@@ -65,14 +65,16 @@ public class Race {
         while (!finished) {
             // decrease score per time step
             score -= 0.1;
-            printTrack();
-            System.out.println("Score: " + score + "Crashes: " + crashCount);
             // extract policy at xt, yt
             car.accelY(policy[car.yt][car.xt][0]);
             car.accelX(policy[car.yt][car.xt][1]);
 
             // evaluate vector and update car if possible
             vectorCheck();
+            if (this.finished) {
+                printTrack();
+                System.out.println("Score: " + score + "Crashes: " + crashCount);
+            }
         }
     }
 
